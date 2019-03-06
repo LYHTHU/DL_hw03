@@ -81,7 +81,7 @@ test_loader = torch.utils.data.DataLoader(
 # Fill in the values below that make this network valid for MNIST data
 
 conv1_in_ch = 1
-# conv2_in_ch = TODO
+conv2_in_ch = 20
 # fc1_in_features = 2500
 fc2_in_features = 500
 n_classes = 10
@@ -94,7 +94,7 @@ class NetWithoutBatchNorm(nn.Module):
     def __init__(self):
         super(NetWithoutBatchNorm, self).__init__()
         self.conv1 = nn.Conv2d(in_channels=conv1_in_ch, out_channels=20, kernel_size=5, stride=1)
-        self.conv2 = nn.Conv2d(in_channels=20, out_channels=50, kernel_size=5, stride=1)
+        self.conv2 = nn.Conv2d(in_channels=conv2_in_ch, out_channels=50, kernel_size=5, stride=1)
         self.fc1 = nn.Linear(in_features=fc1_in_features, out_features=500)
         self.fc2 = nn.Linear(in_features=fc2_in_features, out_features=n_classes)
 
@@ -131,7 +131,7 @@ class NetWithBatchNorm(nn.Module):
         super(NetWithBatchNorm, self).__init__()
         self.conv1 = nn.Conv2d(in_channels=conv1_in_ch, out_channels=20, kernel_size=5, stride=1)
         self.conv1_bn = nn.BatchNorm2d(conv1_bn_size)
-        self.conv2 = nn.Conv2d(in_channels=20, out_channels=50, kernel_size=5, stride=1)
+        self.conv2 = nn.Conv2d(in_channels=conv2_in_ch, out_channels=50, kernel_size=5, stride=1)
         self.conv2_bn = nn.BatchNorm2d(conv2_bn_size)
         self.fc1 = nn.Linear(in_features=fc1_in_features, out_features=500)
         self.fc1_bn = nn.BatchNorm1d(fc1_bn_size)
@@ -203,30 +203,30 @@ def test(model, device, test_loader):
     with torch.no_grad():
         # Loop through data points
         for data, target in test_loader:
-            pass  # remove once implemented
 
             # Send data to device
-            # TODO
+            data, target = data.to(device), target.to(device)
 
             # Pass data through model
-            # TODO
+            output = model(data)
 
             # Compute the negative log likelihood loss with reduction='sum' and add to total test_loss
-            # TODO
+            loss = F.l1_loss(output, target, reduction="sum")
+            test_loss += loss.item()
 
             # Get predictions from the model for each data point
-            # TODO
+            # pred =
 
             # Add number of correct predictions to total num_correct
             # TODO
 
     # Compute the average test_loss
-    # avg_test_loss = TODO
+    avg_test_loss = test_loss / len(test_loader.dataset)
 
     # Print loss (uncomment lines below once implemented)
-    # print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
-    # avg_test_loss, num_correct, len(test_loader.dataset),
-    # 100. * num_correct / len(test_loader.dataset)))
+    print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
+    avg_test_loss, num_correct, len(test_loader.dataset),
+    100. * num_correct / len(test_loader.dataset)))
 
 
 # ### 3.3 Train NetWithoutBatchNorm() [5 pts]
