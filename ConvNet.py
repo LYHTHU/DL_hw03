@@ -46,7 +46,13 @@ if cuda:
 
 
 # Load the MNIST training set with batch size 128, apply data shuffling and normalization
-# train_loader = TODO
+train_loader = torch.utils.data.DataLoader(
+    datasets.MNIST('./data', train=True, download=True,
+                   transform=transforms.Compose([
+                       transforms.ToTensor(),
+                       transforms.Normalize((0.1307,), (0.3081,))
+                   ])),
+    batch_size=128, shuffle=True)
 
 
 # ### 1.1. Load Test Set [4 pts]
@@ -55,7 +61,13 @@ if cuda:
 
 
 # Load the MNIST test set with batch size 128, apply data shuffling and normalization
-# test_loader = TODO
+test_loader = torch.utils.data.DataLoader(
+    datasets.MNIST('./data', train=False, download=True,
+                   transform=transforms.Compose([
+                       transforms.ToTensor(),
+                       transforms.Normalize((0.1307,), (0.3081,))
+                   ])),
+    batch_size=128, shuffle=True)
 
 
 # ## 2. Models
@@ -68,11 +80,11 @@ if cuda:
 
 # Fill in the values below that make this network valid for MNIST data
 
-# conv1_in_ch = TODO
+conv1_in_ch = 1
 # conv2_in_ch = TODO
-# fc1_in_features = TODO
-# fc2_in_features = TODO
-# n_classes = TODO
+# fc1_in_features = 2500
+fc2_in_features = 500
+n_classes = 10
 
 
 # In[ ]:
@@ -95,7 +107,7 @@ class NetWithoutBatchNorm(nn.Module):
         x = F.relu(self.fc1(x))
         x = self.fc2(x)
         # Return the log_softmax of x.
-        # return TODO
+        return F.log_softmax(x)
 
 
 # ### 2.2. CNN with Batch Norm [15 pts]
@@ -134,7 +146,7 @@ class NetWithBatchNorm(nn.Module):
         x = F.relu(self.fc1_bn(self.fc1(x)))
         x = self.fc2(x)
         # Return the log_softmax of x.
-        # return TODO
+        return F.log_softmax(x)
 
 
 # ## 3. Training & Evaluation
@@ -149,31 +161,29 @@ def train(model, device, train_loader, optimizer, epoch, log_interval=100):
     model.train()
     # Loop through data points
     for batch_idx, (data, target) in enumerate(train_loader):
-        pass  # remove once implemented
-
         # Send data and target to device
-        # TODO
+        data, target = data.to(device), target.to(device)
 
         # Zero out the ortimizer
-        # TODO
+        optimizer.zero_grad()
 
         # Pass data through model
-        # TODO
+        output = model(data)
 
         # Compute the negative log likelihood loss
-        # TODO
+        loss = F.nll_loss(output, target)
 
         # Backpropagate loss
-        # TODO
+        loss.backward()
 
         # Make a step with the optimizer
-        # TODO
+        optimizer.step()
 
         # Print loss (uncomment lines below once implemented)
-        # if batch_idx % log_interval == 0:
-        # print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
-        # epoch, batch_idx * len(data), len(train_loader.dataset),
-        # 100. * batch_idx / len(train_loader), loss.item()))
+        if batch_idx % log_interval == 0:
+            print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+            epoch, batch_idx * len(data), len(train_loader.dataset),
+            100. * batch_idx / len(train_loader), loss.item()))
 
 
 # ### 3.2. Define test method [15 pts]
