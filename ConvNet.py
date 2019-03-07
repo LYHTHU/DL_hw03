@@ -82,7 +82,7 @@ test_loader = torch.utils.data.DataLoader(
 
 conv1_in_ch = 1
 conv2_in_ch = 20
-# fc1_in_features = 2500
+fc1_in_features = 800
 fc2_in_features = 500
 n_classes = 10
 
@@ -103,6 +103,7 @@ class NetWithoutBatchNorm(nn.Module):
         x = F.max_pool2d(x, kernel_size=2, stride=2)
         x = F.relu(self.conv2(x))
         x = F.max_pool2d(x, kernel_size=2, stride=2)
+        # 4*4 image
         x = x.view(-1, fc1_in_features)  # reshaping
         x = F.relu(self.fc1(x))
         x = self.fc2(x)
@@ -117,9 +118,9 @@ class NetWithoutBatchNorm(nn.Module):
 
 # Fill in the values below that make this network valid for MNIST data
 
-# conv1_bn_size = TODO
-# conv2_bn_size = TODO
-# fc1_bn_size = TODO
+conv1_bn_size = 128
+conv2_bn_size = 128
+fc1_bn_size = 128
 
 
 # In[ ]:
@@ -211,14 +212,15 @@ def test(model, device, test_loader):
             output = model(data)
 
             # Compute the negative log likelihood loss with reduction='sum' and add to total test_loss
-            loss = F.l1_loss(output, target, reduction="sum")
+            loss = F.nll_loss(output, target, reduction="sum")
             test_loss += loss.item()
 
             # Get predictions from the model for each data point
-            # pred =
+            pred = output.data.max(1, keepdim=True)[
+                1]  # get the index of the max log-probability
 
             # Add number of correct predictions to total num_correct
-            # TODO
+            num_correct += pred.eq(target.data.view_as(pred)).cpu().sum().item()
 
     # Compute the average test_loss
     avg_test_loss = test_loss / len(test_loader.dataset)
@@ -235,20 +237,18 @@ def test(model, device, test_loader):
 
 
 # Deifne model and sent to device
-# model = TODO
+model = NetWithoutBatchNorm().cuda(device)
 
 # Optimizer: SGD with learning rate of 1e-2 and momentum of 0.5
-# optimizer = TODO
+optimizer = optim.SGD(model.parameters(), lr=1e-2, momentum=0.5)
 
 # Training loop with 10 epochs
 for epoch in range(1, 10 + 1):
-    pass  # remove once implemented
-
     # Train model
-    # TODO
+    train(model, device, train_loader, optimizer, epoch)
 
     # Test model
-    # TODO
+    test(model, device, test_loader)
 
 # ### 3.4 Train NetWithBatchNorm() [5 pts]
 
@@ -256,20 +256,18 @@ for epoch in range(1, 10 + 1):
 
 
 # Deifne model and sent to device
-# model = TODO
+model = NetWithBatchNorm().cuda(device)
 
 # Optimizer: SGD with learning rate of 1e-2 and momentum of 0.5
-# optimizer = TODO
+optimizer = optim.SGD(model.parameters(), lr=1e-2, momentum=0.5)
 
 # Training loop with 10 epochs
 for epoch in range(1, 10 + 1):
-    pass  # remove once implemented
-
     # Train model
-    # TODO
+    train(model, device, train_loader, optimizer, epoch)
 
     # Test model
-    # TODO
+    test(model, device, test_loader)
 
 # ## 4. Empirically, which of the models achieves higher accuracy faster? [2 pts]
 
