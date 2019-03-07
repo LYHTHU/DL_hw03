@@ -108,7 +108,7 @@ class NetWithoutBatchNorm(nn.Module):
         x = F.relu(self.fc1(x))
         x = self.fc2(x)
         # Return the log_softmax of x.
-        return F.log_softmax(x)
+        return F.log_softmax(x, dim=1)
 
 
 # ### 2.2. CNN with Batch Norm [15 pts]
@@ -147,7 +147,7 @@ class NetWithBatchNorm(nn.Module):
         x = F.relu(self.fc1_bn(self.fc1(x)))
         x = self.fc2(x)
         # Return the log_softmax of x.
-        return F.log_softmax(x)
+        return F.log_softmax(x, dim=1)
 
 
 # ## 3. Training & Evaluation
