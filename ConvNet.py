@@ -237,7 +237,7 @@ def test(model, device, test_loader):
 
 
 # Deifne model and sent to device
-model = NetWithoutBatchNorm().cuda(device)
+model = NetWithoutBatchNorm().to(device)
 
 # Optimizer: SGD with learning rate of 1e-2 and momentum of 0.5
 optimizer = optim.SGD(model.parameters(), lr=1e-2, momentum=0.5)
@@ -256,7 +256,7 @@ for epoch in range(1, 10 + 1):
 
 
 # Deifne model and sent to device
-model = NetWithBatchNorm().cuda(device)
+model = NetWithBatchNorm().to(device)
 
 # Optimizer: SGD with learning rate of 1e-2 and momentum of 0.5
 optimizer = optim.SGD(model.parameters(), lr=1e-2, momentum=0.5)
