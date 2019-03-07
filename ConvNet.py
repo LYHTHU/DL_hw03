@@ -118,9 +118,9 @@ class NetWithoutBatchNorm(nn.Module):
 
 # Fill in the values below that make this network valid for MNIST data
 
-conv1_bn_size = 128
-conv2_bn_size = 128
-fc1_bn_size = 128
+conv1_bn_size = 20
+conv2_bn_size = 50
+fc1_bn_size = 500
 
 
 # In[ ]:
